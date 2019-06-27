@@ -71,4 +71,5 @@
     password: "{{ ansible_password }}"
     run_level: highest
     state: present
-  notify: reboot the host
+  notify:
+    - reboot the host
