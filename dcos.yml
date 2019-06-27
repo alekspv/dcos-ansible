@@ -60,6 +60,7 @@
       - name: Windows | set password for WinRM connection
         set_fact:
           ansible_password: '{{ hostvars[inventory_hostname].pass }}'
+        no_log: True
 
       - name: Windows | Wait for Windows instances to become reachable
         wait_for_connection:
