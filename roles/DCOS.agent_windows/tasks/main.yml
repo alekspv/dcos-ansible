@@ -31,6 +31,16 @@
     state: present
 
 
+- name: Windows | Create folders and subfolder for DCOS binaries
+  win_file:
+    path: C:\dcos\{{ item }}
+    state: directory
+  with_items:
+    - work
+    - images
+    - mesos-logs
+
+
 - name: Windows | Download mesos-binaries
   win_get_url:
     url: "{{ url_to_mesosbin }}"
@@ -42,16 +52,6 @@
     src: C:\dcos_NO\mesos-binaries.zip
     dest: C:\dcos\mesos-binaries
     creates: C:\dcos\mesos-binaries
-
-
-- name: Windows | Create sub directories for Mesos agent
-  win_file:
-      path: C:\dcos\{{ item }}
-      state: directory
-  with_items:
-        - work
-        - images
-        - mesos-logs
 
 
 - name: Windows | Create start script
