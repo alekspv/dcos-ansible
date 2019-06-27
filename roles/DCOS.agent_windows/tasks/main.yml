@@ -65,7 +65,7 @@
       arguments:  -ExecutionPolicy Unrestricted -NonInteractive -File C:\dcos\start.ps1
     triggers:
     - type: boot
-    restart_count: {{ mesos_agent_restart_count }}
+    restart_count: "{{ mesos_agent_restart_count }}"
     restart_interval: "{{ mesos_agent_restart_interval }}"
     username: "{{ system_user }}"
     password: "{{ ansible_password }}"
