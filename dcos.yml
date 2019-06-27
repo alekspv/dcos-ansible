@@ -1,6 +1,6 @@
 ---
 - name: Wait for instances to become reachable
-  hosts: all!win_agents
+  hosts: all
   gather_facts: no
   tasks:
     - name: Wait for instances to become reachable

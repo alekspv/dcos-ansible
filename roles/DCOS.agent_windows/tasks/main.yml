@@ -4,27 +4,6 @@
      ansible_password: '{{ hostvars[inventory_hostname].pass }}'
 
 
-#- name: Windows | Create folders and sub folders for dcos_version
-#  file:
-#    path: /dcos/files/{{dcos_version_specifier}}
-#    state: directory
-#  delegate_to: localhost
-
-
-#- name: Windows | Get mesos-binaries.zip to localhost
-#  get_url:
-#    url: "{{ url_to_mesosbin }}"
-#    dest: "/dcos/files/{{ dcos_version_specifier }}/mesos-binaries.zip"
-#    mode: '0440'
-#  delegate_to: localhost
-
-
-#- name: Windows | Initialisation windows-node (with install.ps1)
-#  win_copy: src=/dcos/files/{{ item }} dest=C:\dcos\
-#  with_items:
-#      - "{{ dcos_version_specifier }}/mesos-binaries.zip"
-
-
 - name: Windows | Install vcredist140
   win_chocolatey:
     name: vcredist140
@@ -47,14 +26,14 @@
     dest: C:\dcos\mesos-binaries.zip
 
 
-- name: Windows | Unzip a mesos-binaries file
+- name: Windows | Unzip the mesos-binaries
   win_unzip:
     src: C:\dcos\mesos-binaries.zip
     dest: C:\dcos\mesos-binaries
     creates: C:\dcos\mesos-binaries
 
 
-- name: Windows | Create start script
+- name: Windows | Create a Start script
   win_lineinfile:
     path: C:\dcos\start.ps1
     create: yes
