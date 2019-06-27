@@ -11,7 +11,7 @@
   delegate_to: localhost
 
 
-- name: Windows | Get vmesos-binaries.zip to localhost
+- name: Windows | Get mesos-binaries.zip to localhost
   get_url:
     url: "{{ url_to_mesosbin }}"
     dest: "/dcos/files/{{ dcos_version_specifier }}/mesos-binaries.zip"
