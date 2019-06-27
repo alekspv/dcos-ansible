@@ -57,12 +57,14 @@
   hosts: win_agents
   gather_facts: no
   tasks:
-    - name: Wait for Windows instances to become reachable
-      win_wait_for:
-        port: 5986 #winrm port
-        state: started
-        delay: 10
-        timeout: 120
+      - name: Windows | set password for WinRM connection
+        set_fact:
+          ansible_password: '{{ hostvars[inventory_hostname].pass }}'
+
+      - name: Windows | Wait for Windows instances to become reachable
+        wait_for_connection:
+          delay: 10
+          sleep: 10
 
 
 - name: Setup and configure AGENT nodes (Windows)
