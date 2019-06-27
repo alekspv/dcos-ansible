@@ -1,6 +1,5 @@
 ### ansible params for win_agents
 ansible_connection: 'winrm'
-ansible_winrm_transport: basic
 
 ### DCOS params:
 dcos_version_specifier: "{{ dcos_version | default('1.13') }}"
