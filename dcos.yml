@@ -51,9 +51,6 @@
   tasks:
     - include_role:
         name: DCOS.agent
-      tags:
-        - linux_setup
-
 
 - name: Setup and configure AGENT nodes (Windows)
   hosts: win_agents
