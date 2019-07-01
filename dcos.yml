@@ -11,7 +11,6 @@
 
 - name: Collect DC/OS versions
   hosts: all!agents_windows
-  gather_facts: no
   tasks:
     - name: Collect DC/OS versions
       setup:
