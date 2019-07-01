@@ -1,2 +1,1 @@
 ---
-resources_ports: {{ over_resources_ports || default('10000-34000') }}
