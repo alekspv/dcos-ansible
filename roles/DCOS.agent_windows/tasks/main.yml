@@ -28,7 +28,7 @@
     url: "{{ url_to_mesosbin }}"
     dest: C:\dcos\mesos-binaries.{{ dcos_version_specifier }}.zip
   when:
-    zip_file_exists != True
+    zip_file_exists.stat.exists != True
 
 - name: Windows | Unzip the mesos-binaries
   win_unzip:
