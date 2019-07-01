@@ -1,7 +1,4 @@
 # DCOS params:
-#dcos:
-#  version: "1.13.0"
-
 dcos_version_specifier: "{{ dcos['version'] }}"
 zookeeper: "{{ groups['masters'] | join(':2181,') }}:2181"
 
