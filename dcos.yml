@@ -18,7 +18,6 @@
 
 - name: DC/OS Requirements
   hosts: all!agents_windows
-  gather_facts: no
   become: true
   tasks:
     - include_role:
