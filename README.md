@@ -29,7 +29,7 @@ remoteagent1-dcos112s.example.com
 [agents_public]
 publicagent1-dcos112s.example.com
 
-[win_agents]
+[agents_windows]
 agent1-windows.example.com
 agent2-windows.example.com
 
