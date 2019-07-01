@@ -65,6 +65,6 @@
     run_level: highest
     state: present
   when:
-    task_stat.stat.exists == False
+    task_stat.task_exists == False
   notify:
     - reboot the host
