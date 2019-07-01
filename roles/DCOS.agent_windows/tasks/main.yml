@@ -21,14 +21,14 @@
   win_stat:
     path: C:\dcos\mesos-binaries.{{ dcos_version_specifier }}.zip
   register:
-    zip_file_exists
+    zip_file_stat
 
 - name: Windows | Download mesos-binaries
   win_get_url:
     url: "{{ url_to_mesosbin }}"
     dest: C:\dcos\mesos-binaries.{{ dcos_version_specifier }}.zip
   when:
-    zip_file_exists.stat.exists != True
+    zip_file_stat.stat.exists == False
 
 - name: Windows | Unzip the mesos-binaries
   win_unzip:
@@ -41,6 +41,12 @@
     path: C:\dcos\start.ps1
     create: yes
     line: C:\dcos\mesos-binaries\mesos-agent.exe --master="zk://{{zookeeper}}/mesos" --appc_store_dir=\\?\C:\dcos\images\ --work_dir=\\?\C:\dcos\work\ --runtime_dir=\\?\C:\dcos\work\ --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --launcher_dir=\\?\C:\dcos\mesos-binaries\ --log_dir=\\?\C:\dcos\mesos-logs\ --attributes="os:windows" --ip={{inventory_hostname}} --hostname=$(Invoke-RestMethod -uri http://169.254.169.254/latest/meta-data/public-ipv4)
+
+- name: Windows | Check job for mesos-agent exists
+  win_scheduled_task_stat:
+    name: mesos-agent
+  register:
+    task_stat
 
 - name: Windows | Register job for mesos-agent
   win_scheduled_task:
@@ -58,5 +64,7 @@
     password: "{{ ansible_password }}"
     run_level: highest
     state: present
+  when:
+    task_stat.stat.exists == False
   notify:
     - reboot the host
