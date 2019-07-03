@@ -62,7 +62,7 @@
     - type: registration
       repetition:
         interval: "{{ mesos_agent_restart_interval }}"
-        duration: "{{ mesos_agent_restart_duration }}"
+#        duration: "{{ mesos_agent_restart_duration }}"
     restart_count: "{{ mesos_agent_restart_count }}"
     restart_interval: "{{ mesos_agent_restart_interval }}"
     username: "{{ system_user }}"
