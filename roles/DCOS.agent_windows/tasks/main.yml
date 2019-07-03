@@ -74,9 +74,9 @@
   notify:
     - reboot the host
 
-- name: Restart a Mesos-Agent service
-  win_service:
-    name: mesos-agent
-    state: started
-    username: "{{ system_user }}"
-    password: "{{ ansible_password }}"
+#- name: Restart a Mesos-Agent service
+#  win_service:
+#    name: mesos-agent
+#    state: started
+#    username: "{{ system_user }}"
+#    password: "{{ ansible_password }}"
