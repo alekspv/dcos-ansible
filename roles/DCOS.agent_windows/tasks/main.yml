@@ -53,7 +53,7 @@
     name: mesos-agent
     description: mesos-agent
     logon_type: password
-   multiple_instances: 2
+    multiple_instances: 2
     actions:
     - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
       arguments:  -ExecutionPolicy Unrestricted -NonInteractive -File C:\dcos\start.ps1
