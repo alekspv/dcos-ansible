@@ -7,12 +7,11 @@
     name: "{{ mesos_workers.windows.service_name }}"
     dependencies: [ 'docker' ]
     start_mode: auto
-    state: restarted
+    state: started
   listen: set dependency and reboot the service
 
 - name: Windows | Start MESOS agent service
   win_service:
     name: "{{ mesos_workers.windows.service_name }}"
-    start_mode: auto
     state: restarted
   listen: set dependency and reboot the service
