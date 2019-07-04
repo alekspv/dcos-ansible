@@ -6,7 +6,7 @@ mesos_workers:
   windows:
     service_name:     "mesos-agent"
     homedir:          "C:\\dcos"
-    bindir:           "C:\\dcos\\bin"
+    bindir:           "C:\\dcos\\mesos-binaries"
     workdir:          "C:\\dcos\\work"
     imagesdir:        "C:\\dcos\\images"
     logdir:           "C:\\dcos\\mesos-logs"
