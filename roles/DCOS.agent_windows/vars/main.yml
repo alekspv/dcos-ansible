@@ -4,7 +4,7 @@ zookeeper: "{{ groups['masters'] | join(':2181,') }}:2181"
 # mesos-agent specific
 mesos_workers:
   windows:
-    service_name: "mesos-agent1"
+    service_name: "mesos-agent2"
     homedir: "C:\\dcos"
     bindir: "C:\\dcos\\mesos-binaries"
     workdir: "C:\\dcos\\work"
