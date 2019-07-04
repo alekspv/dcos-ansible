@@ -15,6 +15,7 @@ mesos_workers:
     imagesdir: "C:\\dcos\\images"
     logdir: "C:\\dcos\\mesos-logs"
     attributes: "os:windows"
+    executor: "C:\\dcos\\mesos-binaries\\mesos-agent.exe"
 
 # Packages location
 bucket_name: "dcos-win.s3.amazonaws.com"
