@@ -3,6 +3,11 @@
     name: vcredist140
     state: present
 
+- name: Windows | Install nssm
+  win_chocolatey:
+    name: nssm
+    state: present
+    
 - name: Windows | Create folders and subfolder for DCOS binaries
   win_file:
     path: C:\dcos\{{ item }}
