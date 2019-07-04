@@ -45,8 +45,7 @@
   win_nssm:
     name: "mesos-agent"
     application: "C:\\dcos\\mesos-binaries\\mesos-agent.exe"
-    arguments: --master="zk://{{ zookeeper }}/mesos" --launcher_dir="C:\\dcos\\mesos-binaries" --log_dir="C:\\dcos\\mesos-logs" --appc_store_dir="C:\\dcos\\images" --work_dir="C:\\dcos\\images" --runtime_dir="C:\\dcos\work" --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --attributes="os:windows" --ip={{ inventory_hostname }} --hostname={{ inventory_hostname }} --resources='ports:[{{ resources_ports }}]'
-    dependencies: 'docker'
+    arguments: --master="zk://{{ zookeeper }}/mesos" --launcher_dir="C:\\dcos\\mesos-binaries" --log_dir="C:\\dcos\\mesos-logs" --appc_store_dir="C:\\dcos\\images" --work_dir="C:\\dcos\\images" --runtime_dir="C:\\dcos\work" --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --attributes="os:windows" --ip={{ inventory_hostname }} --hostname={{ inventory_hostname }} --resources="ports:[{{ resources_ports }}]"
   notify: Start MESOS agent service on windows node
 
 - name: Set recovery property for service
