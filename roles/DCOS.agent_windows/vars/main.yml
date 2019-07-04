@@ -10,7 +10,8 @@ mesos_workers:
     workdir: "C:\\dcos\\work"
     imagesdir: "C:\\dcos\\images"
     logdir: "C:\\dcos\\mesos-logs"
-
+    attributes: "os:windows"
+    
 resources_ports: "{{ over_resources_ports | default('10000-34000') }}"
 mesos_agent_restart_count: 99
 mesos_agent_restart_interval: "PT1M" # every 1min
