@@ -31,48 +31,56 @@
     line: C:\dcos\mesos-binaries\mesos-agent.exe --master="zk://{{zookeeper}}/mesos" --appc_store_dir=\\?\C:\dcos\images\ --work_dir=\\?\C:\dcos\work\ --runtime_dir=\\?\C:\dcos\work\ --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --launcher_dir=\\?\C:\dcos\mesos-binaries\ --log_dir=C:\dcos\mesos-logs\ --attributes="os:windows" --ip={{inventory_hostname}} --hostname=$(Invoke-RestMethod -uri http://169.254.169.254/latest/meta-data/public-ipv4) --resources='ports:[{{resources_ports}}]'
 
 - name: Windows | Create the new MESOS-AGENT service
-  win_service:
+  win_nssm:
     name: mesos-agent
-    path: C:\dcos\start.ps1
-    display_name: "mesos-agent"
-    description: Mesos Agent on Windows 1809
-
-- name: Windows | Set "docker" dependency for "mesos-agent" service
-  win_service:
-    name: mesos-agent
-    dependencies: [docker]
-
-- name: Windows | Check job for mesos-agent exists
-  win_scheduled_task_stat:
-    name: mesos-agent
-  register:
-    task_stat
-
-- name: Windows | Register job for mesos-agent
-  win_scheduled_task:
-    name: mesos-agent
-    description: mesos-agent
-    logon_type: password
-    multiple_instances: 2
-    actions:
-    - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-      arguments:  -ExecutionPolicy Unrestricted -NonInteractive -File C:\dcos\start.ps1
-    triggers:
-    - type: boot
-    - type: registration
-      repetition:
-        interval: "{{ mesos_agent_restart_interval }}"
-#        duration: "{{ mesos_agent_restart_duration }}"
-    restart_count: "{{ mesos_agent_restart_count }}"
-    restart_interval: "{{ mesos_agent_restart_interval }}"
-    username: "{{ system_user }}"
+    application: C:\dcos\start.ps1
+    dependencies: 'docker'
+    user: "{{ system_user }}"
     password: "{{ ansible_password }}"
-    run_level: highest
-    state: present
-  when:
-    task_stat.task_exists == False
-  notify:
-    - reboot the host
+
+#- name: Windows | Create the new MESOS-AGENT service
+#  win_service:
+#    name: mesos-agent
+#    path: C:\dcos\start.ps1
+#    display_name: "mesos-agent"
+#    description: Mesos Agent on Windows 1809
+#
+#- name: Windows | Set "docker" dependency for "mesos-agent" service
+#  win_service:
+#    name: mesos-agent
+#    dependencies: [docker]
+
+#- name: Windows | Check job for mesos-agent exists
+#  win_scheduled_task_stat:
+#    name: mesos-agent
+#  register:
+#    task_stat
+
+#- name: Windows | Register job for mesos-agent
+#  win_scheduled_task:
+#    name: mesos-agent
+#    description: mesos-agent
+#    logon_type: password
+#    multiple_instances: 2
+#    actions:
+#    - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+#      arguments:  -ExecutionPolicy Unrestricted -NonInteractive -File C:\dcos\start.ps1
+#    triggers:
+#    - type: boot
+#    - type: registration
+#      repetition:
+#        interval: "{{ mesos_agent_restart_interval }}"
+#        duration: "{{ mesos_agent_restart_duration }}"
+#    restart_count: "{{ mesos_agent_restart_count }}"
+#    restart_interval: "{{ mesos_agent_restart_interval }}"
+#    username: "{{ system_user }}"
+#    password: "{{ ansible_password }}"
+#    run_level: highest
+#    state: present
+#  when:
+#    task_stat.task_exists == False
+#  notify:
+#    - reboot the host
 
 #- name: Restart a Mesos-Agent service
 #  win_service:
