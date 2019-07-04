@@ -12,7 +12,7 @@
 - name: Windows | configure the DNS client on Windows-node
   win_dns_client:
     adapter_names: '*'
-    ipv4_addresses: {{ groups['masters'] }}
+    ipv4_addresses: "{{ groups['masters'] }}"
 
 - name: Windows | Create folders and subfolder for DCOS binaries
   win_file:
