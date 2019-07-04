@@ -7,7 +7,7 @@ system_user: "Administrator"
 # specific for service run
 mesos_workers:
   windows:
-    service_name: "mesos-agent2"
+    service_name: "mesos-agent"
     homedir: "C:\\dcos"
     bindir: "C:\\dcos\\mesos-binaries"
     workdir: "C:\\dcos\\work"
