@@ -1,3 +1,9 @@
 - name: Windows | Reboot the host
   win_reboot:
   listen: reboot the host
+
+- name: Start MESOS agent service on windows node
+  win_service:
+    name: "{{mesos_workers.windows.service_name}}"
+    start_mode: auto
+    state: restarted
