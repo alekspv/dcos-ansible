@@ -7,7 +7,7 @@
   win_chocolatey:
     name: nssm
     state: present
-    
+
 - name: Windows | Create folders and subfolder for DCOS binaries
   win_file:
     path: C:\dcos\{{ item }}
@@ -40,8 +40,8 @@
     name: mesos-agent
     application: C:\dcos\start.ps1
     dependencies: 'docker'
-    user: "{{ system_user }}"
-    password: "{{ ansible_password }}"
+#    user: "{{ system_user }}"
+#    password: "{{ ansible_password }}"
 
 #- name: Windows | Create the new MESOS-AGENT service
 #  win_service:
