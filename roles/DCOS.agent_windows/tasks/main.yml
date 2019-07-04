@@ -38,13 +38,11 @@
 - name: Windows | Create the new MESOS-AGENT service
   win_nssm:
     name: "mesos-agent"
-    application: "C:\dcos\mesos-binaries\mesos-agent.exe"
-    app_parameters_free_form: --master="zk://{{zookeeper}}/mesos" --appc_store_dir=\\?\C:\dcos\images\ --work_dir=\\?\C:\dcos\work\ --runtime_dir=\\?\C:\dcos\work\ --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --launcher_dir=\\?\C:\dcos\mesos-binaries\ --log_dir=C:\dcos\mesos-logs\ --attributes="os:windows" --ip={{inventory_hostname}} --hostname=$(Invoke-RestMethod -uri http://169.254.169.254/latest/meta-data/public-ipv4) --resources='ports:[{{resources_ports}}]'
-#   dependencies: 'docker'
-
-
-#    user: "{{ system_user }}"
-#    password: "{{ ansible_password }}"
+    application: "C:\\dcos\\mesos-binaries\\mesos-agent.exe"
+    app_parameters_free_form: --master="zk://{{zookeeper}}/mesos" --appc_store_dir="C:\\dcos\\images" --work_dir="C:\\dcos\\work" --runtime_dir="C:\\dcos\\work" --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --launcher_dir="C:\\dcos\\mesos-binaries" --log_dir="C:\\dcos\\mesos-logs" --attributes="os:windows" --ip={{inventory_hostname}} --hostname=$(Invoke-RestMethod -uri http://169.254.169.254/latest/meta-data/public-ipv4) --resources='ports:[{{resources_ports}}]'
+    dependencies: 'docker'
+    user: "{{ system_user }}"
+    password: "{{ ansible_password }}"
 
 #- name: Windows | Create the new MESOS-AGENT service
 #  win_service:
