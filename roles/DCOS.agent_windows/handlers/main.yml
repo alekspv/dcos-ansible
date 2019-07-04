@@ -5,7 +5,7 @@
 - name: Windows | Set MESOS Agent dependency on Docker service
   win_service:
     name: "{{ mesos_workers.windows.service_name }}"
-    #dependencies: [ 'docker' ]
+    dependencies: [ 'docker' ]
     start_mode: auto
     state: stopped
   listen: set dependency and reboot the service
