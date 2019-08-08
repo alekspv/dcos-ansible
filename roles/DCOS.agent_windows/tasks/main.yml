@@ -22,7 +22,6 @@
     powershell.exe "{{ dockertls.windows.script }}"
   notify: restart docker-engine service
   when: dockertls_test.rc != 0
-  register: ps1_output
 
 - name: Windows | Install vcredist140
   win_chocolatey:
