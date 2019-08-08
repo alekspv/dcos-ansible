@@ -1,121 +1,75 @@
-- name: Windows | Defining DC/OS by using 'version' or, more specifically, 'image_commit'
-  set_fact:
-     dcos_version_specifier: "{{ dcos_version | default('1.13') }}"
-     ansible_password: '{{ hostvars[inventory_hostname].pass }}'
+- name: Windows | Check if DockerTLS already enabled
+  win_command: |
+    docker -H tcp://127.0.0.1:2376 --tlskey "{{ dockertls.windows.volumes.cli_src }}"\key.pem --tlscert  "{{ dockertls.windows.volumes.cli_src }}"\cert.pem --tlscacert  "{{ dockertls.windows.volumes.cli_src }}"\ca.pem --tlsverify --tls info
+  register: dockertls_test
+  ignore_errors: yes
+  changed_when: dockertls_test.rc != 0
 
-
-- debug:
-    msg: "dcos_version_specifier = {{ dcos_version_specifier }} , pass = {{ ansible_password }}, bucket_name = {{ bucket_name }}"
-
-
-#- name: Windows | edit Powershell Start script with local IP address of Mesos Master
-#  replace:#
-#    path: /files/start.ps1
-#    regexp: 'local_ip_master'
-#    replace: '{{  hostvars[groups.masters[0]].inventory_hostname }}'
-#  delegate_to: localhost
-
-
-- name: Windows | create folder for temporaly files
-  file:
-    path: /files
-    state: directory
-  delegate_to: localhost
-
-
-- name: Windows | create sub folder with dcos_version
-  file:
-    path: /files/{{dcos_version_specifier}}
-    state: directory
-  delegate_to: localhost
-
-
-- name: Windows | get vc_redist.x64.exe file from s3 to localhost
-  get_url:
-    url: "http://{{ bucket_name }}/vc_redist.x64.exe"
-    dest: /files/vc_redist.x64.exe
-    mode: '0660'
-  delegate_to: localhost
-
-
-- name: Windows | get vmesos-binaries.zip from s3 to localhost
-  get_url:
-    url: "http://{{ bucket_name }}/{{ dcos_version_specifier }}/mesos-binaries.zip"
-    dest: "/files/{{ dcos_version_specifier }}/mesos-binaries.zip"
-    mode: '0440'
-  delegate_to: localhost
-
-
-- name: Windows | initialisation windows-node (with install.ps1)
-  win_copy: src=/files/{{ item }} dest=C:\
-  with_items:
-      - vc_redist.x64.exe
-      - "{{ dcos_version_specifier }}/mesos-binaries.zip"
-
-
-- name: Windows | install vc_redist
-  win_shell: |
-    cd C:\
-    .\vc_redist.x64.exe /passive /quite /install /norestart /log  .\vcRedist_install.log
-
-
-- name: Windows | Unzip a mesos-binaries file
-  win_unzip:
-    src: C:\mesos-binaries.zip
-    dest: C:\mesos-binaries
-    creates: C:\mesos-binaries
-
-
-- name: Windows | create directories c:\work & c:\images
+- name: Windows | Create docker-cli SSL certificates directory
   win_file:
-      path: C:\{{ item }}
-      state: directory
-  with_items:
-        - work
-        - images
-        - mesos-logs
+    path: "{{ dockertls.windows.volumes.cli_src }}"
+    state: directory
+  when: dockertls_test.rc != 0
 
+- name: Windows | Create dockertls script
+  win_template:
+    src: dockertls.j2
+    dest: "{{ dockertls.windows.script }}"
+  when: dockertls_test.rc != 0
 
-#- name: Windows | Host IP Detection
-#  win_shell: |
-#    $env:HostIP = (Get-NetIPConfiguration | Where-Object {$_.IPv4DefaultGateway -ne $null -and $_.NetAdapter.Status -ne "Disconnected"}).IPv4Address.IPAddress
+- name: Windows | Generate SSL certificates for DockerTLS implementation
+  win_command: |
+    powershell.exe "{{ dockertls.windows.script }}"
+  notify: restart docker-engine service
+  when: dockertls_test.rc != 0
 
+- name: Windows | Install vcredist140
+  win_chocolatey:
+    name: vcredist140
+    state: present
+  notify: reboot the host
 
-- name: Windows | Create start file
-  win_lineinfile:
-    path: c:\start.ps1
-    create: yes
-    line: C:\mesos-binaries\mesos-agent.exe --master={{hostvars[groups.masters[0]].inventory_hostname}}:5050 --appc_store_dir=\\?\C:\images\ --work_dir=\\?\C:\work\ --runtime_dir=\\?\C:\work\ --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --launcher_dir=\\?\C:\mesos-binaries\ --log_dir=\\?\C:\mesos-logs\ --attributes="os:windows" --ip={{inventory_hostname}} --hostname=$(Invoke-RestMethod -uri http://169.254.169.254/latest/meta-data/public-ipv4)
-
-
-- name: Windows | Register Job
-  win_scheduled_task:
-    name: mesos-agent
-    description: mesos-agent
-    logon_type: password
-    actions:
-    - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-      arguments:  -ExecutionPolicy Unrestricted -NonInteractive -File c:\start.ps1
-    triggers:
-    - type: boot
-    restart_count: 99
-    restart_interval: "PT1M"
-    username: Administrator
-    password: "{{ansible_password}}"
-    run_level: highest
+- name: Windows | Install nssm
+  win_chocolatey:
+    name: nssm
     state: present
 
+- name: Windows | configure the DNS client with Masters
+  win_dns_client:
+    adapter_names: '*'
+    ipv4_addresses: "{{ groups['masters'] }}"
 
-#- name: Windows | Wait for start of Mesos Master
-#  local_action:
-#    module: wait_for
-#      host={{  hostvars[groups.masters[0]].inventory_hostname }}
-#      port=5050
-#      delay=2
-#      timeout=180
-#  ignore_errors: true
-#  register: results
+- name: Windows | Create folders and subfolder for DCOS binaries
+  win_file:
+    path: C:\dcos\{{ item }}
+    state: directory
+  with_items:
+    - work
+    - images
+    - mesos-logs
 
+- name: Windows | Download mesos-binaries
+  win_get_url:
+    url: "{{ url_to_mesosbin }}"
+    dest: C:\dcos\mesos-binaries.{{ dcos['version'] }}.zip
+    force: no
 
-- name: Windows | reboot the host
-  win_reboot:
+- name: Windows | Unzip the mesos-binaries
+  win_unzip:
+    src: C:\dcos\mesos-binaries.{{ dcos['version'] }}.zip
+    dest: C:\dcos\mesos-binaries
+    creates: C:\dcos\mesos-binaries
+
+- name: Windows | Install Mesos Agent service
+  win_nssm:
+    name: "{{ mesos_workers.windows.service_name }}"
+    application: "{{ mesos_workers.windows.executor }}"
+    app_parameters_free_form: --master="zk://{{ zookeeper }}/mesos" --launcher_dir="{{ mesos_workers.windows.bindir }}" --log_dir="{{ mesos_workers.windows.logdir }}" --appc_store_dir="{{ mesos_workers.windows.imagesdir }}" --work_dir="{{ mesos_workers.windows.workdir }}" --runtime_dir="{{ mesos_workers.windows.workdir }}" --isolation="windows/cpu,windows/mem,filesystem/windows" --containerizers="mesos,docker" --attributes="{{ mesos_workers.windows.attributes }}" --ip={{ inventory_hostname }} --hostname={{ inventory_hostname }} --resources="ports:[{{ resources_ports }}]" --executor_registration_timeout={{ mesos_workers.windows.executor_timeout }} --fetcher_stall_timeout={{ mesos_workers.windows.fetcher_timeout }}
+
+- name: Windows | Set Mesos Agent dependency on Docker service
+  win_service:
+    name: "{{ mesos_workers.windows.service_name }}"
+    dependencies: [ 'docker' ]
+    start_mode: auto
+  notify: restart mesos-agent service
+  

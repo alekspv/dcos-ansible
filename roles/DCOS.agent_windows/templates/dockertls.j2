@@ -1,0 +1,13 @@
+param(
+  $ServerName = [System.Net.Dns]::GetHostEntry([string]$env:computername).HostName,
+  $IPAddresses = ((Get-NetIPAddress -AddressFamily IPv4).IPAddress) -Join ',',
+  $AlternativeNames = "gateway.docker.internal"
+)
+
+docker container run --rm `
+  -e SERVER_NAME=$ServerName `
+  -e IP_ADDRESSES=$IPAddresses `
+  -e ALTERNATIVE_NAMES=$AlternativeNames `
+  -v "{{ docker_tls.windows.volumes.engine_src }}:{{ docker_tls.windows.volumes.engine_dst }}" `
+  -v "{{ docker_tls.windows.volumes.cli_src }}:{{ docker_tls.windows.volumes.cli_dst }}" `
+  {{ docker_tls.windows.image }}
