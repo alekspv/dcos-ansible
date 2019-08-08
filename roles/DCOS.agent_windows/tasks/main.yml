@@ -72,3 +72,4 @@
     dependencies: [ 'docker' ]
     start_mode: auto
   notify: restart mesos-agent service
+  
