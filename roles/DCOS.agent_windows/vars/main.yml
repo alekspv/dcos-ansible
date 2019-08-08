@@ -19,6 +19,18 @@ mesos_workers:
     executor_timeout: 10mins
     fetcher_timeout: 10mins
 
+# specific for docker tls
+dockertls:
+  windows:
+    service_name: "docker"
+    image: "sergiimatusepam/dockertls-windows:latest"
+    script: "C:\\docker-tls\\dockertls.ps1"
+    volumes:
+      engine_src: "C:\\ProgramData\\docker"
+      engine_dst: "C:\\ProgramData\\docker"
+      cli_src: "C:\\docker-tls\\client\\.docker"
+      cli_dst: "C:\\Users\\ContainerAdministrator\\.docker"
+
 # Packages location
 bucket_name: "dcos-win.s3.amazonaws.com"
 url_to_mesosbin: "http://{{ bucket_name }}/mesos-binaries.{{ dcos['version'] }}.zip"

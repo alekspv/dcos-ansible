@@ -1,3 +1,29 @@
+- name: Windows | Check if DockerTLS already enabled
+  win_command: |
+    docker -H tcp://127.0.0.1:2376 --tlskey "{{ dockertls.windows.volumes.cli_src }}"\key.pem --tlscert  "{{ dockertls.windows.volumes.cli_src }}"\cert.pem --tlscacert  "{{ dockertls.windows.volumes.cli_src }}"\ca.pem --tlsverify --tls info
+  register: dockertls_test
+  ignore_errors: yes
+  changed_when: dockertls_test.rc != 0
+
+- name: Windows | Create docker-cli SSL certificates directory
+  win_file:
+    path: "{{ dockertls.windows.volumes.cli_src }}"
+    state: directory
+  when: dockertls_test.rc != 0
+
+- name: Windows | Create dockertls script
+  win_template:
+    src: dockertls.j2
+    dest: "{{ dockertls.windows.script }}"
+  when: dockertls_test.rc != 0
+
+- name: Windows | Generate SSL certificates for DockerTLS implementation
+  win_command: |
+    powershell.exe "{{ dockertls.windows.script }}"
+  notify: restart docker-engine service
+  when: dockertls_test.rc != 0
+  register: ps1_output
+
 - name: Windows | Install vcredist140
   win_chocolatey:
     name: vcredist140
@@ -46,4 +72,4 @@
     name: "{{ mesos_workers.windows.service_name }}"
     dependencies: [ 'docker' ]
     start_mode: auto
-  notify: restart the service
+  notify: restart mesos-agent service

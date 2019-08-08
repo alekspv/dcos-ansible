@@ -1,3 +1,10 @@
+- name: Windows | Restart Docker engine service
+  win_service:
+    name: "{{ dockertls.windows.service_name }}"
+    state: restarted
+    force_dependent_services: yes
+  listen: restart docker-engine service
+
 - name: Windows | Reboot the host
   win_reboot:
   listen: reboot the host
@@ -6,4 +13,4 @@
   win_service:
     name: "{{ mesos_workers.windows.service_name }}"
     state: restarted
-  listen: restart the service
+  listen: restart mesos-agent service
